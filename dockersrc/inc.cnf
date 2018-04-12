@@ -1,0 +1,14 @@
+[inception]
+general_log=1
+general_log_file=inception.log
+port=6669
+socket=/tmp/inc.socket
+character-set-client-handshake=0
+character-set-server=utf8
+inception_remote_system_password=
+inception_remote_system_user=
+inception_remote_backup_port=
+inception_remote_backup_host=
+inception_support_charset=utf8,utf8mb4
+inception_osc_on=ON
+inception_osc_bin_dir=/usr/bin
