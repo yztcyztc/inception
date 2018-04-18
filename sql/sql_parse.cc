@@ -5159,16 +5159,6 @@ int mysql_check_column_default(
             mysql_errmsg_append(thd);
         }
 
-        //检查INT类型不能为字符串
-        if (field_info && (field_info->real_type == MYSQL_TYPE_INT24
-            || field_info->real_type == MYSQL_TYPE_TINY
-            || field_info->real_type == MYSQL_TYPE_LONG
-            || field_info->real_type == MYSQL_TYPE_LONGLONG) && default_value->type() == Item::STRING_ITEM)
-        {
-            my_error(ER_INVALID_DEFAULT, MYF(0), field_name);
-            mysql_errmsg_append(thd);
-        }
-
         //检查非法时间值
         if ((default_value->type() == Item::INT_ITEM ||
             default_value->type() == Item::STRING_ITEM ||
