@@ -7913,7 +7913,7 @@ int mysql_get_create_sql_from_table_info(
     create_sql->append("(");
 
     create_sql->append("id bigint auto_increment primary key, ");
-    create_sql->append("rollback_statement mediumtext, ");
+    create_sql->append("rollback_statement longtext, ");
     create_sql->append("opid_time varchar(50), ");
     create_sql->append("KEY idx_opid_time (opid_time)");
     create_sql->append(") ENGINE INNODB DEFAULT CHARSET UTF8MB4;");
