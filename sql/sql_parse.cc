@@ -4289,6 +4289,11 @@ int mysql_check_update(THD *thd)
     {
         for (table=thd->lex->query_tables; table; table=table->next_global)
         {
+            if (table->table_name && *table->table_name == '*')
+            {
+                continue;
+            }
+
             table_info = mysql_get_table_object(thd, table->db, table->table_name, TRUE);
             if (table_info == NULL) {
                 tablenotexisted=true;
@@ -6469,6 +6474,11 @@ mysql_load_tables(
 
     for (table= tables->first; table; table= table->next_local)
     {
+        if (table->table_name && *table->table_name == '*')
+        {
+            continue;
+        }
+
         tableinfo = mysql_get_table_object(thd, table->db, table->table_name, TRUE);
         //如果有自连接，或者在不同层次使用了同一个表，那么以上层主准
         if (tableinfo)

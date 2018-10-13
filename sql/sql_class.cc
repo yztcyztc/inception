@@ -1096,28 +1096,25 @@ bool THD::init_audit_connection()
 
 MYSQL* THD::get_audit_connection()
 {
-  if (!audit_conn_inited)
-  {
-    if (init_audit_connection() == FALSE)
-      return NULL;
-    else
-      return &audit_conn.mysql;
-  }
-  else if (!strcmp(audit_conn.user, thd_sinfo->user)
-      && !strcmp(audit_conn.passwd, thd_sinfo->password)
-      && !strcmp(audit_conn.host, thd_sinfo->host)
-      && audit_conn.port == thd_sinfo->port)
-  {
-    return &audit_conn.mysql;
-  }
-  else
-  {
+    if (!audit_conn_inited)
+    {
+        if (init_audit_connection() == FALSE)
+            return NULL;
+        return &audit_conn.mysql;
+    }
+
+    if (!strcmp(audit_conn.user, thd_sinfo->user)
+    && !strcmp(audit_conn.passwd, thd_sinfo->password)
+    && !strcmp(audit_conn.host, thd_sinfo->host)
+    && audit_conn.port == thd_sinfo->port)
+    {
+        return &audit_conn.mysql;
+    }
+
     mysql_close(&audit_conn.mysql);
     if (init_audit_connection() == FALSE)
-      return NULL;
-    else
-      return &audit_conn.mysql;
-  }
+            return NULL;
+    return &audit_conn.mysql;
 }
 
 bool THD::init_backup_connection()
