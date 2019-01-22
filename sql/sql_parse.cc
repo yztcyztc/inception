@@ -548,6 +548,8 @@ mysql_statement_is_backup(
         sql_cache_node->optype == SQLCOM_DELETE ||
         sql_cache_node->optype == SQLCOM_INSERT_SELECT ||
         sql_cache_node->optype == SQLCOM_UPDATE ||
+        sql_cache_node->optype == SQLCOM_UPDATE_MULTI ||
+        sql_cache_node->optype == SQLCOM_DELETE_MULTI ||
         sql_cache_node->optype == SQLCOM_CREATE_TABLE ||
         sql_cache_node->optype == SQLCOM_DROP_TABLE ||
         sql_cache_node->optype == SQLCOM_ALTER_TABLE)
@@ -6502,22 +6504,44 @@ mysql_load_tables(
 
     tables = &select_lex->table_list;
 
-    for (table= tables->first; table; table= table->next_local)
-    {
-        if (table->table_name && *table->table_name == '*')
+    if (thd->lex->sql_command == SQLCOM_UPDATE_MULTI || thd->lex->sql_command == SQLCOM_DELETE_MULTI){
+        TABLE_LIST *table;
+        for (table=thd->lex->query_tables; table; table=table->next_global)
         {
-            continue;
-        }
+            if (table->table_name && *table->table_name == '*')
+            {
+                continue;
+            }
 
-        tableinfo = mysql_get_table_object(thd, table->db, table->table_name, TRUE);
-        //如果有自连接，或者在不同层次使用了同一个表，那么以上层主准
-        if (tableinfo)
+            tableinfo = mysql_get_table_object(thd, table->db, table->table_name, TRUE);
+            //如果有自连接，或者在不同层次使用了同一个表，那么以上层主准
+            if (tableinfo)
+            {
+                tablert = (table_rt_t*)my_malloc(sizeof(table_rt_t), MY_ZEROFILL);
+                tablert->table_info = tableinfo;
+                if (table->alias)
+                    strcpy(tablert->alias, table->alias);
+                LIST_ADD_LAST(link, rt->table_rt_lst, tablert);
+            }
+        }
+    }
+    else{
+        tables = &select_lex->table_list;
+        for (table= tables->first; table; table= table->next_local)
         {
-            tablert = (table_rt_t*)my_malloc(sizeof(table_rt_t), MY_ZEROFILL);
-            tablert->table_info = tableinfo;
-            if (table->alias)
-                strcpy(tablert->alias, table->alias);
-            LIST_ADD_LAST(link, rt->table_rt_lst, tablert);
+            if (strcmp(table->db ,"") == 0 && strcmp(table->table_name ,"*") == 0 )
+                    continue;
+
+            tableinfo = mysql_get_table_object(thd, table->db, table->table_name, TRUE);
+            //如果有自连接，或者在不同层次使用了同一个表，那么以上层主准
+            if (tableinfo)
+            {
+                tablert = (table_rt_t*)my_malloc(sizeof(table_rt_t), MY_ZEROFILL);
+                tablert->table_info = tableinfo;
+                if (table->alias)
+                    strcpy(tablert->alias, table->alias);
+                LIST_ADD_LAST(link, rt->table_rt_lst, tablert);
+            }
         }
     }
 
@@ -6582,6 +6606,11 @@ retry:
                         if (!strcasecmp(tableinfo->table_name, tablename) ||
                             !strcasecmp(ret_tablert->alias, tablename))
                         {
+                            return ret_tablert;
+                        }
+                        else if (thd->lex->sql_command == SQLCOM_UPDATE_MULTI ||
+                            thd->lex->sql_command == SQLCOM_DELETE_MULTI ){
+                            // 如果是update/delete多表,不再进行列校验,由explain实现.
                             return ret_tablert;
                         }
                     }
@@ -7986,7 +8015,9 @@ mysql_sql_cache_is_valid(
         sql_cache_node->optype == SQLCOM_INSERT ||
         sql_cache_node->optype == SQLCOM_DELETE ||
         sql_cache_node->optype == SQLCOM_INSERT_SELECT ||
-        sql_cache_node->optype == SQLCOM_UPDATE)
+        sql_cache_node->optype == SQLCOM_UPDATE ||
+        sql_cache_node->optype == SQLCOM_UPDATE_MULTI ||
+        sql_cache_node->optype == SQLCOM_DELETE_MULTI)
         && sql_cache_node->exe_complete)
     {
         return TRUE;
@@ -9346,9 +9377,11 @@ int mysql_execute_backup_info_insert_sql(
         backup_sql->append("\'INSERT\'");
         break;
     case SQLCOM_DELETE:
+    case SQLCOM_DELETE_MULTI:
         backup_sql->append("\'DELETE\'");
         break;
     case SQLCOM_UPDATE:
+    case SQLCOM_UPDATE_MULTI:
         backup_sql->append("\'UPDATE\'");
         break;
     case SQLCOM_CREATE_DB:
@@ -10233,6 +10266,38 @@ int mysql_modify_binlog_format_row(MYSQL *mysql)
     DBUG_ENTER("mysql_modify_binlog_format_row");
 
     sprintf(set_format, "set binlog_format=row;");
+    if (mysql_real_query(mysql, set_format, strlen(set_format)))
+    {
+        my_message(mysql_errno(mysql), mysql_error(mysql), MYF(0));
+        DBUG_RETURN(true);
+    }
+
+    DBUG_RETURN(false);
+}
+
+int mysql_close_sql_safe_updates(MYSQL* mysql)
+{
+    char set_format[32];
+
+    DBUG_ENTER("mysql_close_sql_safe_updates");
+
+    sprintf(set_format, "set session sql_safe_updates=0;");
+    if (mysql_real_query(mysql, set_format, strlen(set_format)))
+    {
+        my_message(mysql_errno(mysql), mysql_error(mysql), MYF(0));
+        DBUG_RETURN(ER_NO);
+    }
+
+    DBUG_RETURN(false);
+}
+
+int mysql_set_wait_timeout(MYSQL *mysql)
+{
+    char set_format[32];
+
+    DBUG_ENTER("mysql_modify_sql_safe_update");
+
+    sprintf(set_format,"set session wait_timeout=28800;");
     if (mysql_real_query(mysql, set_format, strlen(set_format)))
     {
         my_message(mysql_errno(mysql), mysql_error(mysql), MYF(0));
@@ -11235,6 +11300,8 @@ int mysql_get_remote_variables(THD* thd)
     }
 
     mysql_free_result(source_res);
+    if (mysql_close_sql_safe_updates(mysql) == ER_NO)
+        DBUG_RETURN(ER_NO);
     DBUG_RETURN(false);
 }
 
@@ -11272,6 +11339,12 @@ int mysql_check_binlog_format(THD* thd, char* binlogformat)
     }
 
     mysql_free_result(source_res);
+    sprintf(set_format,"set session wait_timeout=28800;");
+    if (mysql_real_query(mysql, set_format, strlen(set_format)))
+    {
+        my_message(mysql_errno(mysql), mysql_error(mysql), MYF(0));
+        DBUG_RETURN(ER_NO);
+    }
     DBUG_RETURN(false);
 }
 
