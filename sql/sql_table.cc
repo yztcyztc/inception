@@ -2274,11 +2274,31 @@ mysql_prepare_create_table(THD *thd, HA_CREATE_INFO *create_info,
 		if (!(key_info->flags & HA_NULL_PART_KEY))
 			unique_key=1;
 		key_info->key_length=(uint16) key_length;
-		if (key_length > max_key_length && key->type != Key::FULLTEXT)
-		{
-			my_error(ER_TOO_LONG_KEY,MYF(0),key->name.str,max_key_length);
-            mysql_errmsg_append(thd);
-		}
+//		 if (key_length > max_key_length && key->type != Key::FULLTEXT)
+//		 {
+//		 	my_error(ER_TOO_LONG_KEY,MYF(0),key->name.str,max_key_length);
+//		 	mysql_errmsg_append(thd);
+//		 }
+
+        // 5.7开始默认索引长度限制为3072bytes
+        MYSQL* mysql;
+        mysql = thd->get_audit_connection();
+        if (!mysql)
+            return false;
+        if (mysql && strncmp(mysql->server_version, "5.7", 3) >= 0){
+            if (key_length > 3072 && key->type != Key::FULLTEXT)
+            {
+                my_error(ER_TOO_LONG_KEY,MYF(0),key->name.str, 3072);
+                mysql_errmsg_append(thd);
+            }
+        }
+        else {
+            if (key_length > max_key_length && key->type != Key::FULLTEXT)
+            {
+                my_error(ER_TOO_LONG_KEY,MYF(0),key->name.str,max_key_length);
+                mysql_errmsg_append(thd);
+            }
+        }
 		if (validate_comment_length(thd, key->key_create_info.comment.str,
 			&key->key_create_info.comment.length,
 			INDEX_COMMENT_MAXLEN,

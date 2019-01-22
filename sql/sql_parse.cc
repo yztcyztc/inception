@@ -3228,6 +3228,19 @@ int mysql_check_version_56(THD* thd)
     return true;
 }
 
+int mysql_check_version_57(THD* thd)
+{
+    MYSQL* mysql;
+    mysql = thd->get_audit_connection();
+    if (!mysql)
+        return false;
+
+    if (mysql && strncmp(mysql->server_version, "5.7", 3) < 0)
+        return false;
+
+    return true;
+}
+
 int mysql_check_insert_select_ex(THD *thd, table_info_t* table_info)
 {
     ORDER*   order;
@@ -5040,10 +5053,25 @@ int mysql_check_create_index(THD *thd)
             }
         }
 
-        if (keymaxlen > MAX_KEY_LENGTH)
-        {
-            my_error(ER_TOO_LONG_KEY,MYF(0),key->name.str, MAX_KEY_LENGTH); 
-            mysql_errmsg_append(thd);
+//        if (keymaxlen > MAX_KEY_LENGTH)
+//        {
+//            my_error(ER_TOO_LONG_KEY,MYF(0),key->name.str, MAX_KEY_LENGTH);
+//            mysql_errmsg_append(thd);
+//        }
+        // 5.7开始默认索引长度限制为3072bytes
+        if (mysql_check_version_57(thd)){
+            if (keymaxlen > 3072)
+                {
+                    my_error(ER_TOO_LONG_KEY,MYF(0),key->name.str, 3072);
+                    mysql_errmsg_append(thd);
+                }
+        }
+        else{
+            if (keymaxlen > MAX_KEY_LENGTH)
+            {
+                my_error(ER_TOO_LONG_KEY,MYF(0),key->name.str, MAX_KEY_LENGTH);
+                mysql_errmsg_append(thd);
+            }
         }
 
         if (!table_info->new_cache)
