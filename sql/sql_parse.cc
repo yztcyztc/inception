@@ -53,6 +53,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301  USA */
 // reset_mqh
 #include "sql_rename.h"       // mysql_rename_table
 #include <string.h>
+#include <sstream>
 #include "sql_tablespace.h"   // mysql_alter_tablespace
 #include "hostname.h"         // hostname_cache_refresh
 #include "sql_acl.h"          // *_ACL, check_grant, is_acl_user,
@@ -113,6 +114,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301  USA */
 #include "sql_time.h"
 using std::max;
 using std::min;
+using std::stringstream;
 
 #define FLAGSTR(V,F) ((V)&(F)?#F" ":"")
 
@@ -9144,6 +9146,7 @@ int mysql_get_field_string(Field* field, String* backupsql, char* null_arr, int 
     String buffer((char*) buff,sizeof(buff),&my_charset_bin);
     String buffer2((char*) buff,sizeof(buff),&my_charset_bin);
     char* dupcharfield;
+    std::stringstream ss;
 
     // backupsql->append(separated);
 
@@ -9222,13 +9225,27 @@ int mysql_get_field_string(Field* field, String* backupsql, char* null_arr, int 
             {
                 //    float nr;
                 //    nr= (float) field->val_real();
-                res=field->val_str(&buffer);
+                //    res=field->val_str(&buffer);
+                float nr= field->val_real();
+                ss.clear(); // 清空
+                ss<<nr;
+
+                backupsql->append(ss.str().c_str());
+                append_flag = FALSE;
+                ss.str("");
                 break;
             }
         case MYSQL_TYPE_DOUBLE:
             {
-                res=field->val_str(&buffer);
+                //    res=field->val_str(&buffer);
                 //    double nr= field->val_real();
+                double nr= field->val_real();
+                ss.clear(); // 清空
+                ss<<nr;
+
+                backupsql->append(ss.str().c_str());
+                append_flag = FALSE;
+                ss.str("");
                 break;
             }
         case MYSQL_TYPE_DATETIME:
