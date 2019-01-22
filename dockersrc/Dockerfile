@@ -1,8 +1,5 @@
 FROM docker.io/centos
 
-COPY inc.cnf /opt
-COPY bison-2.7-4.el7.x86_64.rpm /opt
-
 #inception
 RUN yum -y install wget git gcc gcc-c++ make cmake openssl-devel ncurses-devel m4\
     && cd /opt \  
