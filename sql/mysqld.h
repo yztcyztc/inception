@@ -164,6 +164,7 @@ extern ulong inception_max_key_parts;
 extern ulong inception_max_update_rows;
 extern ulong inception_max_keys;
 extern bool inception_enable_not_innodb;
+extern bool inception_enable_set_engine;
 extern char* inception_support_charset;
 extern bool inception_check_table_comment;
 extern bool inception_check_column_comment;

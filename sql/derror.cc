@@ -121,6 +121,7 @@ bool init_errmessage(void)
   SERVER_SETMSG(ER_DUP_INDEX, "Duplicate index \'%-.64s\' defined on the table \'%-.64s.%-.64s\'.");
   SERVER_SETMSG(ER_TEMP_TABLE_TMP_PREFIX, "Set \'tmp\' prefix for temporary table.");
   SERVER_SETMSG(ER_TABLE_MUST_INNODB, "Set engine to innodb for table \'%-.64s\'.");
+  SERVER_SETMSG(ER_TABLE_ENGINE_NOT_ALLOWED, "Cannot set engine for table \'%-.64s\'.");
   SERVER_SETMSG(ER_TABLE_CHARSET_MUST_UTF8, "Set charset to one of \'%-.192s\' for table \'%-.64s\'.");
   SERVER_SETMSG(ER_NAMES_MUST_UTF8, "Set charset to one of \'%-.192s\'.");
   SERVER_SETMSG(ER_TABLE_MUST_HAVE_COMMENT, "Set comments for table \'%-.192s\'.");

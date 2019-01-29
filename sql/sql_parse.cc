@@ -1964,6 +1964,7 @@ int mysql_get_err_level_by_errno(THD *   thd)
     case ER_VIEW_SELECT_CLAUSE:
     case ER_NOT_SUPPORTED_ITEM_TYPE:
     case ER_INCEPTION_EMPTY_QUERY:
+    case ER_TABLE_ENGINE_NOT_ALLOWED:
         return INCEPTION_PARSE;
 
     default:
@@ -2034,6 +2035,11 @@ mysql_check_inception_variables(
 
     case ER_TABLE_MUST_INNODB:
         if (inception_enable_not_innodb)
+            return false;
+        break;
+
+    case ER_TABLE_ENGINE_NOT_ALLOWED:
+        if (inception_enable_set_engine)
             return false;
         break;
 
@@ -4818,11 +4824,27 @@ int mysql_check_create_table(THD *thd)
         }
     }
 
-    if (create_info_ptr->db_type != (handlerton *)DB_TYPE_INNODB)
+    if (inception_enable_set_engine)
     {
-        my_error(ER_TABLE_MUST_INNODB, MYF(0), create_table->table_name);
-        mysql_errmsg_append(thd);
+        if(create_info_ptr->db_type != (handlerton *)DB_TYPE_INNODB)
+        {
+            my_error(ER_TABLE_MUST_INNODB, MYF(0), create_table->table_name);
+            mysql_errmsg_append(thd);
+        }
+    }else
+    {
+        if (create_info_ptr->db_type != NULL)
+        {
+            my_error(ER_TABLE_ENGINE_NOT_ALLOWED, MYF(0), create_table->table_name);
+            mysql_errmsg_append(thd);
+        }
     }
+
+//    if (create_info_ptr->db_type != (handlerton *)DB_TYPE_INNODB)
+//    {
+//        my_error(ER_TABLE_MUST_INNODB, MYF(0), create_table->table_name);
+//        mysql_errmsg_append(thd);
+//    }
 
     if (create_info_ptr->default_table_charset == NULL ||
         !mysql_check_charset(create_info_ptr->default_table_charset->csname))
@@ -6075,10 +6097,26 @@ int mysql_check_alter_option(THD *thd)
     {
         if (create_info.used_fields & HA_CREATE_USED_ENGINE)
         {
-            if (create_info.db_type != (handlerton *)DB_TYPE_INNODB)
+//            if (create_info.db_type != (handlerton *)DB_TYPE_INNODB)
+//            {
+//                my_error(ER_TABLE_MUST_INNODB, MYF(0), thd->lex->query_tables->table_name);
+//                mysql_errmsg_append(thd);
+//            }
+
+            if (inception_enable_set_engine)
             {
-                my_error(ER_TABLE_MUST_INNODB, MYF(0), thd->lex->query_tables->table_name);
-                mysql_errmsg_append(thd);
+                if(create_info.db_type != (handlerton *)DB_TYPE_INNODB)
+                {
+                    my_error(ER_TABLE_MUST_INNODB, MYF(0), thd->lex->query_tables->table_name);
+                    mysql_errmsg_append(thd);
+                }
+            }else
+            {
+                if (create_info.db_type != NULL)
+                {
+                    my_error(ER_TABLE_ENGINE_NOT_ALLOWED, MYF(0), thd->lex->query_tables->table_name);
+                    mysql_errmsg_append(thd);
+                }
             }
 
             create_info.used_fields &= ~HA_CREATE_USED_ENGINE;

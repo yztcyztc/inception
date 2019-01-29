@@ -693,6 +693,12 @@ static Sys_var_mybool Sys_inception_enable_not_innodb(
     GLOBAL_VAR(inception_enable_not_innodb),
     CMD_LINE(OPT_ARG), DEFAULT(FALSE));
 
+static Sys_var_mybool Sys_inception_enable_set_engine(
+        "inception_enable_set_engine",
+        "check engine when create table ",
+        GLOBAL_VAR(inception_enable_set_engine),
+        CMD_LINE(OPT_ARG), DEFAULT(TRUE));
+
 static bool check_charset(sys_var *self, THD *thd, set_var *var)
 {
     char*   charset;
