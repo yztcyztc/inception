@@ -11,6 +11,40 @@ https://inception-document.readthedocs.io/zh_CN/latest/
 
 https://hub.docker.com/r/hhyo/inception
 
+#### 配置文件准备，参考配置（inc.cnf）
+```
+[inception]
+general_log=1
+general_log_file=inception.log
+port=6669
+socket=/tmp/inc.socket
+character-set-client-handshake=0
+character-set-server=utf8
+inception_remote_system_password=root
+inception_remote_system_user=wzf1
+inception_remote_backup_port=3306
+inception_remote_backup_host=127.0.0.1
+inception_support_charset=utf8,utf8mb4
+inception_enable_nullable=0
+inception_check_primary_key=1
+inception_check_column_comment=1
+inception_check_table_comment=1
+inception_osc_on=OFF
+inception_osc_bin_dir=/usr/bin
+inception_osc_min_table_size=1
+inception_osc_chunk_time=0.1
+inception_enable_blob_type=1
+inception_check_column_default_value=1
+```
+#### 指定配置文件和端口启动
+```
+docker run --name inception -v /local_path/inc.cnf:/etc/inc.cnf  -p 6669:6669 -dti hhyo/inception
+```
+#### 访问
+```
+mysql -hxxxx -P6669
+```
+
 ## WEB平台
 
 https://github.com/hhyo/archery
