@@ -8,8 +8,8 @@ RUN yum -y install wget git gcc gcc-c++ make cmake openssl-devel ncurses-devel m
     && mv /opt/inception/dockersrc/inc.cnf /etc \
     && cd inception \
     && ./inception_build.sh debug \
-    && yum -y install http://www.percona.com/downloads/percona-release/redhat/0.1-3/percona-release-0.1-3.noarch.rpm \
-    && yum -y install percona-toolkit.x86_64 \
+    && yum -y install https://repo.percona.com/yum/percona-release-latest.noarch.rpm \
+    && yum -y install percona-toolkit \
 #修改中文支持
     && rm -rf /etc/localtime && ln -s /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \ 
     && yum -y install kde-l10n-Chinese && yum -y reinstall glibc-common \ 
