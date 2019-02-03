@@ -730,6 +730,12 @@ err:
     return false;
 }
 
+static Sys_var_charptr Sys_inception_language_code(
+    "inception_language_code",
+    "A string representing the language. See the list of language identifiers and Internationalization and localization.",
+    READ_ONLY GLOBAL_VAR(inception_language_code), CMD_LINE(REQUIRED_ARG),
+    IN_FS_CHARSET, DEFAULT("en-US"));
+
 static Sys_var_charptr Sys_inception_support_charset(
     "inception_support_charset",
     "check charset when create table or alter, set multi charset use comma to concat",

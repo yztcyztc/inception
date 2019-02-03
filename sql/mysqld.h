@@ -193,6 +193,7 @@ extern bool inception_read_only;
 extern bool inception_check_identifier;
 extern bool inception_ddl_support;
 extern bool inception_osc_on;
+extern char* inception_language_code;
 // extern ulong inception_osc_critical_connected;
 // extern ulong inception_osc_critical_running;
 // extern ulong inception_osc_max_connected;

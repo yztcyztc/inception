@@ -557,6 +557,7 @@ char *inception_user = NULL;
 char *inception_password = NULL;
 uint remote_backup_port = 0;
 
+char *inception_language_code = "en-US";
 bool inception_check_insert_field=0;
 bool inception_check_dml_where=0;
 bool inception_check_dml_limit=0;
