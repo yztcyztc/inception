@@ -8000,7 +8000,7 @@ int mysql_get_create_sql_backup_table(
     create_sql->append("type VARCHAR(20),");
     create_sql->append("PRIMARY KEY(opid_time)");
 
-    create_sql->append(")ENGINE INNODB DEFAULT CHARSET UTF8MB4;");
+    create_sql->append(")ENGINE INNODB DEFAULT CHARSET UTF8MB4 ROW_FORMAT compressed;");
 
     return 0;
 }
@@ -8023,7 +8023,7 @@ int mysql_get_create_sql_from_table_info(
     create_sql->append("rollback_statement longtext, ");
     create_sql->append("opid_time varchar(50), ");
     create_sql->append("KEY idx_opid_time (opid_time)");
-    create_sql->append(") ENGINE INNODB DEFAULT CHARSET UTF8MB4;");
+    create_sql->append(") ENGINE INNODB DEFAULT CHARSET UTF8MB4 ROW_FORMAT compressed;");
 
     return 0;
 }
@@ -8096,7 +8096,7 @@ int mysql_get_statistic_table_sql(
     create_sql->append("createdb int not null default 0, ");
     create_sql->append("truncating int not null default 0 ");
 
-    create_sql->append(") ENGINE INNODB DEFAULT CHARSET UTF8;");
+    create_sql->append(") ENGINE INNODB DEFAULT CHARSET UTF8 ROW_FORMAT compressed;");
 
     return 0;
 }
