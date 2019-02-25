@@ -20,6 +20,7 @@ port=6669
 socket=/tmp/inc.socket
 character-set-client-handshake=0
 character-set-server=utf8
+inception_language_code=zh-CN
 inception_remote_system_password=root
 inception_remote_system_user=wzf1
 inception_remote_backup_port=3306
