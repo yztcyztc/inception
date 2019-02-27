@@ -120,12 +120,12 @@ bool init_errmessage(void)
 		SERVER_SETMSG(ER_TOO_LONG_INDEX_COMMENT, "Comment for index \'%-.64s\' is too long (max = %lu).");
 		SERVER_SETMSG(ER_DUP_INDEX, "索引定义重复 \'%-.64s\'");
 		SERVER_SETMSG(ER_TEMP_TABLE_TMP_PREFIX, "请设置临时表的前缀为 \'tmp_\'");
-		SERVER_SETMSG(ER_TABLE_MUST_INNODB, "请设置表引擎为INNODB");
-		SERVER_SETMSG(ER_TABLE_ENGINE_NOT_ALLOWED, "表 \'%-.64s\' 禁止指定表引擎");
-		SERVER_SETMSG(ER_TABLE_CHARSET_MUST_UTF8, "请给表设置字符集，仅支持\'%-.192s\'");
+		SERVER_SETMSG(ER_TABLE_MUST_INNODB, "请设置存储引擎为INNODB");
+		SERVER_SETMSG(ER_TABLE_ENGINE_NOT_ALLOWED, "表 \'%-.64s\' 禁止指定存储引擎");
+		SERVER_SETMSG(ER_TABLE_CHARSET_MUST_UTF8, "请给数据库/表设置字符集，仅支持\'%-.192s\'");
 		SERVER_SETMSG(ER_NAMES_MUST_UTF8, "仅支持 \'%-.192s\' 字符集");
 		SERVER_SETMSG(ER_TABLE_MUST_HAVE_COMMENT, "请给表 \'%-.192s\' 添加注释");
-		SERVER_SETMSG(ER_COLUMN_HAVE_NO_COMMENT, "请给字段 \'%-.64s\' 加上注释");
+		SERVER_SETMSG(ER_COLUMN_HAVE_NO_COMMENT, "请给字段 \'%-.64s\' 添加注释");
 		SERVER_SETMSG(ER_TABLE_MUST_HAVE_PK, "请给表 \'%-.64s\' 添加主键，表必须要有一个主键");
 		SERVER_SETMSG(ER_PARTITION_NOT_ALLOWED, "禁止创建分区表");
 		SERVER_SETMSG(ER_USE_ENUM, "Type enum is used in column.");
@@ -180,9 +180,9 @@ bool init_errmessage(void)
 		SERVER_SETMSG(ER_UNKNOWN_TABLE, "Unknown table \'%-.192s\' in %-.32s.");
 		SERVER_SETMSG(ER_INVALID_GROUP_FUNC_USE, "Invalid use of group function.");
 		SERVER_SETMSG(ER_INDEX_USE_ALTER_TABLE, "请使用ALTER语句进行索引变更");
-		SERVER_SETMSG(ER_WITH_DEFAULT_ADD_COLUMN, "建议为字段 \'%-.192s\' 添加默认值，在插入数据时无默认值的列未指定值将会报错");
+		SERVER_SETMSG(ER_WITH_DEFAULT_ADD_COLUMN, "建议给字段 \'%-.192s\' 添加默认值");
 		SERVER_SETMSG(ER_TRUNCATED_WRONG_VALUE, "Truncated incorrect %-.32s value: \'%-.128s\'");
-		SERVER_SETMSG(ER_TEXT_NOT_NULLABLE_ERROR, "TEXT/BLOB字段 \'%-.64s\' 不允许为NULL");
+		SERVER_SETMSG(ER_TEXT_NOT_NULLABLE_ERROR, "TEXT/BLOB字段 \'%-.64s\' 不允许为NOT NULL");
 		SERVER_SETMSG(ER_WRONG_VALUE_FOR_VAR, "Variable \'%-.64s\' can\'t be set to the value of \'%-.200s\'");
 		SERVER_SETMSG(ER_TOO_MUCH_AUTO_TIMESTAMP_COLS, "Incorrect table definition; there can be only one TIMESTAMP column with CURRENT_TIMESTAMP in DEFAULT or ON UPDATE clause");
 		SERVER_SETMSG(ER_INVALID_ON_UPDATE, "Invalid ON UPDATE clause for \'%-.192s\' column");
