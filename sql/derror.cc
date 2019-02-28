@@ -182,7 +182,7 @@ bool init_errmessage(void)
 		SERVER_SETMSG(ER_INDEX_USE_ALTER_TABLE, "请使用ALTER语句进行索引变更");
 		SERVER_SETMSG(ER_WITH_DEFAULT_ADD_COLUMN, "建议给字段 \'%-.192s\' 添加默认值");
 		SERVER_SETMSG(ER_TRUNCATED_WRONG_VALUE, "Truncated incorrect %-.32s value: \'%-.128s\'");
-		SERVER_SETMSG(ER_TEXT_NOT_NULLABLE_ERROR, "TEXT/BLOB字段 \'%-.64s\' 不允许为NOT NULL");
+		SERVER_SETMSG(ER_TEXT_NOT_NULLABLE_ERROR, "TEXT/BLOB字段 \'%-.64s\' 不允许为NULL，请指定为NOT NULL");
 		SERVER_SETMSG(ER_WRONG_VALUE_FOR_VAR, "Variable \'%-.64s\' can\'t be set to the value of \'%-.200s\'");
 		SERVER_SETMSG(ER_TOO_MUCH_AUTO_TIMESTAMP_COLS, "Incorrect table definition; there can be only one TIMESTAMP column with CURRENT_TIMESTAMP in DEFAULT or ON UPDATE clause");
 		SERVER_SETMSG(ER_INVALID_ON_UPDATE, "Invalid ON UPDATE clause for \'%-.192s\' column");
