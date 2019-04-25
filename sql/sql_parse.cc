@@ -2017,7 +2017,6 @@ mysql_check_inception_variables(
             return false;
         break;
 
-    case ER_TEXT_NOT_NULLABLE_ERROR:
     case ER_NOT_ALLOWED_NULLABLE:
         if (inception_enable_nullable)
             return false;
@@ -5335,7 +5334,7 @@ int mysql_field_check(THD* thd, Create_field* field, char* table_name)
         mysql_errmsg_append(thd);
     }
 
-    if (!(field->flags & NOT_NULL_FLAG) && mysql_field_is_blob(field->sql_type))
+    if ((field->flags & NOT_NULL_FLAG) && mysql_field_is_blob(field->sql_type))
     {
         my_error(ER_TEXT_NOT_NULLABLE_ERROR, MYF(0), field->field_name, table_name);
         mysql_errmsg_append(thd);
